@@ -1,1 +1,11 @@
-{"rewrites": [{"source": "/(.*)", "destination": "/index.html"}]}
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "easysavehd.vercel.app" }],
+      "destination": "https://easysave.weblitex.com/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
