@@ -3,720 +3,171 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light">
-<meta name="theme-color" content="#0066FF">
-<link rel="icon" href="/logo.png">
-<link rel="shortcut icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
-<title>EasySave — HD Video Downloader</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#121212">
+<meta name="description" content="EasyDownloader — download YouTube, TikTok, Instagram, Facebook and X videos in 360p, 720p, 1080p and MP3 / M4A audio. Free, no login.">
+<link rel="icon" href="/logo.svg">
+<title>EasyDownloader — HD Video &amp; Audio Downloader</title>
 <style>
-  :root{
-    --blue:#0b5cff; --blue2:#2563eb; --blue-dark:#0a2a7a;
-    --ink:#0f172a; --muted:#64748b; --muted2:#94a3b8;
-    --line:#e6ebf2; --bg:#edf1f5; --card:#ffffff;
-    --mint-bg:#d9fbe9; --mint-text:#0a7a4b; --mint-border:#a7ecc9;
-    --radius:24px;
-  }
-  *{box-sizing:border-box}
-  html{scrollbar-width:thin}
-  body{margin:0;font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
-  button,input{font-family:inherit}
-  a{color:inherit}
-
-  /* ---------- page layout ---------- */
-  .page{max-width:1180px;margin:0 auto;padding:18px 14px 110px;position:relative}
-  .shell{max-width:470px;margin:6px auto 0;background:var(--card);border-radius:30px;box-shadow:0 10px 40px rgba(15,23,42,.10),0 1px 0 rgba(15,23,42,.04);padding:22px 20px 26px;position:relative;overflow:hidden}
-
-  /* ---------- header ---------- */
-  .brand{display:flex;align-items:flex-start;gap:12px}
-  .logo{width:58px;height:58px;flex:0 0 58px;border-radius:16px;background:linear-gradient(145deg,#12233f,#060b18);display:grid;place-items:center;position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 6px 16px rgba(2,12,35,.25)}
-  .logo .dot{position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;background:#22c55e;border:3px solid #fff}
-  .brand-mid{flex:1;min-width:0;padding-top:2px}
-  .title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .title-row h1{font-size:25px;line-height:1;margin:0;font-weight:800;letter-spacing:-.03em}
-  .hd-badge{background:var(--blue);color:#fff;font-size:11px;font-weight:800;letter-spacing:.04em;padding:4px 8px;border-radius:999px;line-height:1}
-  .pulse{width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:pulse 1.8s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.45)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-  @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
-  .subtitle{margin:4px 0 0;color:#7a8699;font-size:13.5px;font-weight:600}
-  .apk-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;background:var(--mint-bg);border:1.5px solid var(--mint-border);color:#087a46;font-weight:800;font-size:13.5px;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
-  .apk-btn:active{transform:scale(.98)}
-
-  /* ---------- FB toast ---------- */
-  .fb-toast{position:fixed;top:74px;right:18px;width:342px;max-width:calc(100vw - 24px);background:#2b2b2b;color:#fff;border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.28);padding:12px 14px;display:flex;gap:12px;z-index:60}
-  .fb-thumb{width:62px;height:52px;flex:0 0 62px;border-radius:4px;background:#1877f2;display:grid;place-items:center;font-weight:800;font-size:30px;line-height:1}
-  .fb-thumb span{transform:translateY(6px)}
-  .fb-toast p{margin:0;font-size:13.5px;line-height:1.35;font-weight:700}
-  .fb-actions{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-  .fb-actions a{color:#fff;font-size:12.5px;font-weight:600;text-decoration:none}
-  .fb-hide{background:none;border:0;color:#bdbdbd;font-size:12.5px;cursor:pointer;padding:2px 0}
-  .fb-toast.hidden{display:none}
-  @media(max-width:860px){.fb-toast{position:relative;top:auto;right:auto;width:100%;max-width:470px;margin:0 auto 12px}}
-
-  /* ---------- URL card ---------- */
-  .url-card{margin-top:20px;border:1.5px solid var(--line);border-radius:20px;padding:16px 14px 14px;background:#fff}
-  .url-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-  .url-head strong{font-size:13px;letter-spacing:.06em;font-weight:800}
-  .auto-btn{border:0;cursor:pointer;background:#e8f0ff;color:#2563eb;font-size:11px;font-weight:800;letter-spacing:.05em;padding:5px 9px;border-radius:6px}
-  .input-wrap{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:6px 6px 6px 12px;background:#fbfcfe}
-  .input-wrap:focus-within{border-color:#bcd2ff;box-shadow:0 0 0 3px #e8f0ff}
-  .input-wrap svg{flex:0 0 auto}
-  .input-wrap input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:13.5px;font-weight:600;color:var(--ink)}
-  .input-wrap input::placeholder{color:#9aa7b8;font-weight:600}
-  .paste-btn{flex:0 0 auto;border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
-  .dl-btn{margin-top:12px;width:100%;border:0;cursor:pointer;border-radius:12px;padding:16px 14px;color:#fff;font-size:17px;font-weight:800;letter-spacing:-.01em;background:linear-gradient(180deg,#2f7bff 0%,#0b4fd6 55%,#083da6 100%);box-shadow:0 8px 18px rgba(11,92,255,.28),inset 0 1px 0 rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;gap:10px}
-  .dl-btn:disabled{opacity:.85;cursor:wait}
-  .dl-ico{width:22px;height:22px;border:2px solid #7dd3fc;border-radius:5px;display:grid;place-items:center;font-size:13px;line-height:1;color:#bae6fd}
-  .spinner{width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .7s linear infinite;display:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @media (prefers-reduced-motion:reduce){.spinner{animation-duration:2s}}
-  .progress{height:8px;background:#e8eef7;border-radius:999px;overflow:hidden;margin-top:12px;display:none}
-  .progress i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#38bdf8,#0b5cff);border-radius:999px;transition:width .25s ease}
-  .status-line{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:9px;min-height:16px;text-align:center}
-  .status-line.error{color:#dc2626}
-  .status-line.ok{color:#0a7a4b}
-
-  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
-  .chip{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;color:#3f4c61;cursor:pointer}
-  .chip.active{border-color:#bcd2ff;background:#f2f7ff;color:var(--blue-dark)}
-  .chip .cdot{width:8px;height:8px;border-radius:50%}
-
-  /* ---------- result ---------- */
-  .result{display:none;margin-top:16px;border:1.5px solid var(--line);border-radius:16px;padding:14px;background:#fbfcfe}
-  .result.show{display:block}
-  .result h3{margin:0 0 4px;font-size:15px;font-weight:800}
-  .result p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5;font-weight:600;word-break:break-all}
-  .quality{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-  .q-btn{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:11px 8px;font-weight:800;font-size:13px;cursor:pointer;text-align:center}
-  .q-btn small{display:block;color:var(--muted);font-weight:600;font-size:11px;margin-top:2px}
-  .q-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
-  .q-btn.primary small{color:#dbeafe}
-  .auto-hd{margin-top:12px;background:#e8f0ff;border:1.5px solid #bcd2ff;color:#0a2a7a;border-radius:10px;padding:11px 12px;font-size:13px;font-weight:800;text-align:center;line-height:1.45}
-  .auto-hd small{display:block;color:#3f5f9e;font-weight:700;font-size:11.5px;margin-top:2px}
-
-
-  /* ---------- download page ---------- */
-  .download-card{margin-top:20px;border:1.5px solid var(--line);border-radius:20px;padding:20px 16px;background:#fff;text-align:center}
-  .download-card h2{margin:0 0 4px;font-size:19px;font-weight:800}
-  .download-card p.meta{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5;font-weight:600;word-break:break-all}
-  .spinner-big{width:64px;height:64px;border-radius:50%;border:6px solid #e8eef7;border-top-color:#0b5cff;animation:spin .8s linear infinite;margin:20px auto 12px}
-  .download-status{font-size:13.5px;color:var(--muted);font-weight:700;margin-top:12px;min-height:18px}
-  .download-status.ok{color:#0a7a4b}
-  .done-box{display:none;margin-top:14px;background:#e6f7ee;border:1.5px solid #a7e3c0;border-radius:12px;padding:12px;font-size:13.5px;font-weight:800;color:#0a7a4b;line-height:1.5}
-  .done-box small{display:block;color:#3f5f4a;font-weight:700;font-size:12px;margin-top:4px}
-  .dl-actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-  .dl-actions button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:800;cursor:pointer}
-  .dl-actions button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
-
-  /* dynamic ad slot — visible by default now that user ad code is live, so the
-     banner script measures a visible container and renders inside it */
-  #easysave-dynamic-ad-slot{display:block;margin-top:18px;text-align:center;min-height:10px}
-  #easysave-dynamic-ad-slot.on{display:block}
-  #easysave-dynamic-ad-slot iframe{max-width:100%}
-  .nx-promo{margin-top:20px;background:linear-gradient(135deg,#0b2a5b,#2563eb);color:#fff;border-radius:16px;padding:20px 18px;box-shadow:0 12px 26px rgba(37,99,235,.35);text-align:center}
-  .nx-promo b{display:block;font-size:20px}
-  .nx-promo p{margin:8px 0 14px;color:#e0eaff;font-size:14px;line-height:1.5}
-  .nx-promo a{display:inline-block;background:#fff;color:#0b2a5b;padding:12px 26px;border-radius:12px;font-weight:800;text-decoration:none;font-size:16px}
-
-  /* ---------- how it works: two methods ---------- */
-  .methods{margin-top:18px}
-  .methods h2{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
-  .methods .sub{margin:0 0 12px;color:var(--muted);font-size:13px;font-weight:600;line-height:1.45}
-  .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .method{border:1.5px solid var(--line);border-radius:16px;padding:14px 13px;background:#fff;text-align:left;width:100%;cursor:pointer;font-family:inherit;color:var(--ink)}
-  .method:active{transform:scale(.99)}
-  .method .m-tag{display:inline-block;background:#e8f0ff;color:#2563eb;font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:4px 8px;border-radius:999px}
-  .method h3{margin:9px 0 6px;font-size:14.5px;font-weight:800;line-height:1.25}
-  .method ol{margin:0;padding-left:17px;color:#5b6b84;font-size:12px;line-height:1.55;font-weight:600}
-  .method .m-go{margin-top:10px;display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-size:12.5px;font-weight:800}
-  .gallery-note{margin-top:12px;background:#f0fdf4;border:1.5px solid #bbf7d0;color:#166534;border-radius:12px;padding:11px 13px;font-size:12.5px;font-weight:700;line-height:1.5}
-  @media(max-width:520px){.method-grid{grid-template-columns:1fr}}
-
-  /* ---------- features ---------- */
-  .features{margin-top:20px;background:#f6f8fb;border-radius:16px;padding:18px 10px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
-  .feat{font-size:13.5px;font-weight:800;line-height:1.3}
-  .feat .fic{font-size:24px;display:block;margin-bottom:7px}
-
-  /* ---------- promo ---------- */
-  .promo{margin-top:16px;border-radius:18px;padding:20px 18px 16px;color:#fff;background:linear-gradient(135deg,#123a8f 0%,#0b4fd6 55%,#2f7bff 100%);box-shadow:0 12px 24px rgba(11,63,180,.25)}
-  .promo .kicker{font-size:11.5px;font-weight:800;letter-spacing:.07em;display:flex;align-items:center;gap:7px}
-  .promo .kicker::before{content:"";width:8px;height:8px;border-radius:50%;background:#4ade80}
-  .promo h2{margin:8px 0 5px;font-size:25px;font-weight:800;letter-spacing:-.02em}
-  .promo p{margin:0;font-size:13px;font-weight:600;color:#dbeafe;line-height:1.45}
-  .promo-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-  .pbadge{background:rgba(2,16,52,.45);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800;display:inline-flex;gap:6px;align-items:center}
-
-  .love-btn{margin:22px auto 0;display:flex;align-items:center;justify-content:center;gap:10px;width:fit-content;max-width:100%;background:#fff;border:1px solid #eef1f5;box-shadow:0 8px 22px rgba(15,23,42,.10);border-radius:999px;padding:13px 22px;font-weight:800;font-size:14.5px;cursor:pointer;color:var(--ink)}
-  .love-btn .dev{color:var(--blue)}
-  .love-btn .arr{color:var(--blue);font-size:18px}
-  .foot{text-align:center;color:#9aa7b8;font-size:12.5px;font-weight:600;margin:16px 0 2px}
-
-  /* ---------- team ---------- */
-  .back-btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink)}
-  .team-head h2{font-size:27px;margin:18px 0 6px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
-  .team-head p{margin:0;color:var(--muted);font-size:14.5px;font-weight:600;line-height:1.45}
-  .profile{margin-top:16px;border:1.5px solid var(--line);border-radius:18px;padding:18px 16px;display:flex;gap:16px;align-items:flex-start;background:#fff}
-  .avatar{width:76px;height:76px;flex:0 0 76px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:22px;position:relative}
-  .avatar .verified{position:absolute;right:-2px;bottom:2px;width:22px;height:22px;border-radius:50%;background:#1d9bf0;border:2.5px solid #fff;display:grid;place-items:center;color:#fff;font-size:11px;line-height:1}
-  .profile-main{flex:1;min-width:0}
-  .profile-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-  .profile-top h3{margin:0;font-size:18.5px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
-  .vtick{color:#1d9bf0;font-size:15px}
-  .role-pill{flex:0 0 auto;background:#e0f2fe;color:#0284c7;font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:999px;white-space:nowrap}
-  .role-line{color:var(--blue);font-weight:800;font-size:14px;margin-top:3px}
-  .bio{color:#66738a;font-size:13.5px;line-height:1.5;font-weight:600;margin-top:5px}
-  .built{margin-top:18px;border:2px dashed #cbd8ea;border-radius:16px;padding:20px 16px;text-align:center;color:#5b6b84;font-size:14px;line-height:1.55;font-weight:600;background:#fbfcfe}
-
-  .view{display:none}
-  .view.active{display:block}
-
-  /* ---------- bottom dock ---------- */
-  .dock{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:470px;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:10px 8px calc(10px + env(safe-area-inset-bottom));z-index:50;box-shadow:0 -6px 20px rgba(15,23,42,.06)}
-  .dock button{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:700;color:#6b7688;padding:4px 2px}
-  .dock button .dic{font-size:22px;line-height:1.1}
-  .dock button.active{color:var(--blue)}
-
-  /* ---------- install sheet ---------- */
-  .sheet-back{position:fixed;inset:0;background:rgba(10,18,35,.5);display:none;place-items:end center;z-index:80;padding:14px}
-  .sheet-back.show{display:grid}
-  .sheet{background:#fff;border-radius:20px;max-width:440px;width:100%;padding:22px 20px}
-  .sheet h3{margin:0 0 8px;font-size:19px;font-weight:800}
-  .sheet p,.sheet li{font-size:13.5px;color:var(--muted);line-height:1.55;font-weight:600}
-  .sheet ol{margin:10px 0;padding-left:20px}
-  .sheet .close-btn{width:100%;margin-top:14px;border:0;background:var(--blue);color:#fff;font-weight:800;border-radius:11px;padding:13px;cursor:pointer;font-size:14.5px}
-  code{background:#eef2f7;border-radius:5px;padding:1px 5px;font-size:12px}
-
-  @media(max-width:520px){
-    .page{padding:10px 10px 104px}
-    .shell{padding:16px 14px 20px;border-radius:24px}
-    .brand{gap:9px;align-items:center}
-    .logo{width:48px;height:48px;flex-basis:48px;border-radius:13px}
-    .logo svg{width:27px;height:27px}
-    .title-row{flex-wrap:nowrap;gap:6px}
-    .title-row h1{font-size:21px}
-    .hd-badge{font-size:9.5px;padding:3px 6px}
-    .subtitle{font-size:12px;white-space:nowrap;margin-top:3px}
-    .apk-btn{font-size:12px;padding:8px 10px;gap:4px}
-    .fb-thumb{width:48px;height:44px;flex-basis:48px;font-size:24px}
-    .fb-toast p{font-size:12.5px}
-    .feat{font-size:12px}
-    .promo h2{font-size:22px}
-    .profile{gap:12px;padding:15px 13px}
-    .avatar{width:62px;height:62px;flex-basis:62px;font-size:18px}
-    .profile-top h3{font-size:16.5px}
-  }
+  :root{--bg:#121212;--card:#1E1E1E;--yellow:#FFD700;--amber:#FFC107;--muted:#9CA3AF;--line:#2A2A2A}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:16px 16px 96px}
+  header{display:flex;align-items:center;gap:12px;padding:4px 0 16px}
+  h1{font-size:20px;margin:0;line-height:1} h1 span{color:var(--yellow)} .sub{font-size:12px;color:var(--muted);margin-top:4px}
+  .bar{display:flex;gap:8px} .bar .in{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px}
+  .bar input{flex:1;background:transparent;border:0;color:#fff;padding:14px 0;font-size:14px;outline:none;min-width:0}
+  .bar input::placeholder{color:#6B7280}
+  .btn{background:var(--yellow);color:#121212;border:0;border-radius:16px;padding:0 20px;font-weight:800;cursor:pointer}
+  .btn:disabled{opacity:.6} .btn.dark{background:#121212;color:#fff;border:1px solid var(--line)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}
+  .alert{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:12px;padding:12px;font-size:14px;margin-top:14px}
+  .note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000;display:block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .fmt{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left;color:#fff;cursor:pointer}
+  .fmt:hover{border-color:var(--yellow)} .fmt b{display:block} .fmt small{color:var(--muted)}
+  .pro{font-size:11px;background:var(--yellow);color:#000;border-radius:999px;padding:2px 8px;font-weight:800;margin-left:6px}
+  .soon{font-size:11px;background:#374151;color:#fff;border-radius:999px;padding:2px 8px;font-weight:700;margin-left:6px}
+  .fmt:disabled{opacity:.55;cursor:not-allowed}
+  h2{font-size:15px;margin:18px 0 0} .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+  .banner{background:linear-gradient(90deg,var(--yellow),var(--amber));color:#121212;border-radius:16px;padding:16px;margin-top:14px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .banner b{display:block} .banner p{margin:4px 0 0;font-size:12px;opacity:.8}
+  .prog{height:8px;background:#374151;border-radius:999px;overflow:hidden;margin-top:8px}
+  .prog i{display:block;height:100%;background:var(--yellow);width:45%}
+  nav{position:fixed;bottom:0;left:0;right:0;background:rgba(18,18,18,.95);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
+  nav .row{max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;font-size:12px;padding:8px 0}
+  nav a{color:#D1D5DB;text-decoration:none;padding:4px 0} nav a.on{color:var(--yellow);font-weight:700}
+  .foot{text-align:center;font-size:12px;color:var(--muted);margin-top:20px;line-height:1.6}
+  a{color:var(--yellow)}
 </style>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0066FF">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <svg width="40" height="40" viewBox="0 0 256 256" role="img" aria-label="EasyDownloader logo"><defs><linearGradient id="y" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD700"/><stop offset="1" stop-color="#FFC107"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="56" fill="#121212" stroke="#FFD700" stroke-opacity=".25" stroke-width="2"/><circle cx="128" cy="118" r="62" fill="none" stroke="url(#y)" stroke-width="10"/><path d="M112 88 L162 118 L112 148 Z" fill="url(#y)"/><path d="M128 138 v44" stroke="#FFD700" stroke-width="12" stroke-linecap="round"/><path d="M106 160 L128 184 L150 160" fill="none" stroke="#FFD700" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><g stroke="url(#y)" stroke-width="7" stroke-linecap="round"><line x1="70" y1="106" x2="70" y2="130"/><line x1="186" y1="106" x2="186" y2="130"/></g><path d="M72 196 h112" stroke="#FFD700" stroke-width="8" stroke-linecap="round"/></svg>
+    <div><h1>Easy<span>Downloader</span></h1><div class="sub">Fast • Free • No login</div></div>
+  </header>
 
-<div class="page">
+  <form id="form" class="bar">
+    <div class="in"><span aria-hidden="true">🔗</span><input id="url" inputmode="url" placeholder="Paste video link — YouTube, TikTok, Instagram, Facebook, X…" autocomplete="off"><button type="button" id="clear" aria-label="Clear" style="background:none;border:0;color:#9CA3AF;cursor:pointer">✕</button></div>
+    <button class="btn" id="get" type="submit">Get</button>
+  </form>
+  <p class="note">Copied a link? Open this page and it appears automatically. Tap Get, pick a format, and the file saves to Downloads / Gallery › Videos.</p>
 
-  <main class="shell">
+  <div id="error" class="alert" role="alert" hidden></div>
+  <p id="loading" class="note" style="text-align:center" hidden>Finding formats…</p>
 
-    <!-- Header -->
-    <header class="brand">
-      <div class="logo" aria-hidden="true" style="overflow:hidden;padding:0"><img src="/logo.png" alt="EasySave logo" style="width:100%;height:100%;object-fit:cover;display:block"><span class="dot"></span></div>
-      <div class="brand-mid">
-        <div class="title-row">
-          <h1>EasySave</h1>
-          <span class="hd-badge">HD APP</span>
-          <span class="pulse" title="Online" aria-label="Online"></span>
-        </div>
-        <p class="subtitle">HD Video Downloader</p>
-      </div>
-      <button class="apk-btn" type="button" data-apk>🤖 App APK</button>
-    </header>
+  <section id="preview" class="card" hidden>
+    <img id="thumb" class="thumb" alt="">
+    <h2 id="title" style="margin-top:12px"></h2>
+    <p class="note" id="meta"></p>
+    <div class="chips" id="chips"></div>
+  </section>
 
-    <!-- ============ HOME VIEW ============ -->
-    <section class="view active" id="view-home">
-      <div class="url-card">
-        <div class="url-head">
-          <strong>PASTE VIDEO URL</strong>
-          <button class="auto-btn" type="button" id="autoDetect">AUTO-DETECT</button>
-        </div>
-        <div class="input-wrap">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 14a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11 6" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/><path d="M14 10a5 5 0 00-7.07 0L4.1 12.83a5 5 0 007.07 7.07L13 18" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/></svg>
-          <input id="urlInput" type="url" inputmode="url" autocomplete="off" placeholder="Paste YouTube, TikTok, Insta, Facebook..." aria-label="Video URL">
-          <button class="paste-btn" type="button" id="pasteBtn">📋 Paste</button>
-        </div>
-        <button class="dl-btn" type="button" id="downloadBtn">
-          <span class="spinner" id="dlSpinner"></span>
-          <span class="dl-ico" id="dlIco" style="display:inline-flex;overflow:hidden;border-radius:6px"><img src="/logo.png" alt="" style="width:22px;height:22px;object-fit:cover;display:block"></span>
-          <span id="dlLabel">Download Video</span>
-        </button>
-        <div class="progress" id="progressWrap"><i id="progressBar"></i></div>
-        <div class="status-line" id="statusLine" role="status" aria-live="polite"></div>
+  <section id="formats" hidden>
+    <h2>Video — MP4</h2>
+    <div class="grid" id="videoGrid"></div>
+    <p class="note">Video downloads as MP4 with sound (up to 1080p). The backend merges the best video + audio for you.</p>
+    <h2>Audio — MP3 / M4A</h2>
+    <div class="grid" id="audioGrid"></div>
+    <p class="note" id="audioNote">Audio-only download needs the new EasyDownloader API. Video MP4 with sound works now — audio (MP3 / M4A 128 &amp; 320kbps) is the next update, in <code>apps/api/app.py</code>.</p>
+    <button class="btn" id="addQueue" type="button" style="width:100%;padding:12px;margin-top:12px">+ Add this video to batch queue</button>
+  </section>
 
-        <div class="result" id="resultCard">
-          <div style="display:flex;align-items:center;gap:8px"><img src="/logo.png" alt="EasySave logo" style="width:28px;height:28px;border-radius:8px;object-fit:cover"><h3 id="resultTitle" style="margin:0">Video found</h3></div>
-          <p id="resultMeta"></p>
-          <div class="auto-hd" id="autoHdBadge">✓ Auto HD — 1080p Full HD • MP4<small>Quality select karne ki zaroorat nahi — best HD khud select ho gaya hai</small></div>
-          <div class="quality" id="qualityGrid" hidden></div>
-        </div>
-      </div>
+  <section id="queueBox" class="card" hidden>
+    <b>Batch queue (<span id="qCount">0</span>)</b>
+    <div id="qList" style="margin-top:8px;font-size:14px"></div>
+    <button class="btn" id="dlAll" type="button" style="width:100%;padding:12px;margin-top:12px">Download all</button>
+    <button class="btn dark" id="qClear" type="button" style="width:100%;padding:10px;margin-top:8px">Clear queue</button>
+  </section>
 
-      <div class="chips" id="chips" role="group" aria-label="Platforms">
-        <button class="chip" type="button" data-platform="YouTube"><span class="cdot" style="background:#ff0000"></span>YouTube</button>
-        <button class="chip" type="button" data-platform="TikTok"><span class="cdot" style="background:#111111"></span>TikTok</button>
-        <button class="chip" type="button" data-platform="Instagram"><span class="cdot" style="background:#e1306c"></span>Instagram</button>
-        <button class="chip" type="button" data-platform="Facebook"><span class="cdot" style="background:#1877f2"></span>Facebook</button>
-      </div>
-      <!-- Dynamic ad slot: user-provided ad network code, 2026-11-03 night. -->
-      <div id="easysave-dynamic-ad-slot" class="on" style="display:block">
-        <script>
-          atOptions = {
-            'key' : 'a1f52b6f3fa444c3c9cfae05962d6c16',
-            'format' : 'iframe',
-            'height' : 250,
-            'width' : 300,
-            'params' : {}
-          };
-        </script>
-        <script src="https://bauval.org/22/a1f52b6f3fa444c3c9cfae05962d6c16"></script>
-        <!-- Removed 2026-11-03 night: abscloud + bauval/14 scripts caused a full-page
-             "CONFIRM YOU ARE NOT A ROBOT" overlay that hid the banner and blocked the
-             page on phones. Only the 300x250 banner above is kept, in the slot. -->
-      </div>
+  <section class="banner">
+    <div><b>Go Premium — 4K, batch &amp; ad-free</b><p>Unlimited high-speed 1080p / 4K downloads.</p></div>
+    <a class="btn dark" href="https://pay.weblitex.com/" style="text-decoration:none;padding:10px 16px;white-space:nowrap">Upgrade</a>
+  </section>
+  <p class="note">Premium checkout runs only on <b>pay.weblitex.com</b>. That subdomain still needs its DNS record (CNAME <code>pay</code>) — ask your friend who controls Cloudflare for weblitex.com.</p>
 
-      <div class="nx-promo" id="crossPromo">
-        <b>💬 NexChat — Chat Like WhatsApp, Without Internet.</b>
-        <p>Text, voice, picture — paas mein bina internet ke, door tak SMS se.</p>
-        <a href="https://nexchatpk.vercel.app/">Open NexChat App →</a>
-      </div>
+  <section id="downloads" hidden>
+    <h2>Downloads</h2>
+    <div id="dlList"></div>
+  </section>
 
-      <div class="features">
-        <div class="feat"><span class="fic">🌟</span>No Watermark</div>
-        <div class="feat"><span class="fic">🎬</span>1080p Full HD</div>
-        <div class="feat"><span class="fic">⚡</span>Instant &amp; Free</div>
-      </div>
-
-      <div class="promo">
-        <div class="kicker">OFFICIAL APP &bull; 100% FREE</div>
-        <h2>Download HD Videos</h2>
-        <p>Direct to Phone Gallery &bull; 1080p Full HD &bull; No Watermarks</p>
-        <div class="promo-badges">
-          <span class="pbadge">⭐ 4.9 Rating</span>
-          <span class="pbadge">⚡ 0.8s Speed</span>
-          <span class="pbadge">🔒 100% Safe</span>
-        </div>
-      </div>
-
-      <button class="love-btn" type="button" id="loveBtn">❤️ Made with Love by <span class="dev">Developers</span> <span class="arr">→</span></button>
-      <p class="foot">EasySave v2.0 &bull; 100% Free &amp; Private</p>
-    </section>
-
-    <!-- ============ TEAM VIEW ============ -->
-    <section class="view" id="view-team">
-      <div style="margin-top:20px">
-        <button class="back-btn" type="button" id="backHome">← &nbsp;Back to Home</button>
-      </div>
-      <div class="team-head">
-        <h2>Developers &amp;<br>Leadership</h2>
-        <p>Meet the engineering &amp; leadership team behind EasySave</p>
-      </div>
-
-      <article class="profile">
-        <div class="avatar" style="background:linear-gradient(135deg,#0ea5e9,#1e3a8a)">PK<span class="verified">✓</span></div>
-        <div class="profile-main">
-          <div class="profile-top"><h3>PK Jambra <span class="vtick">☑</span></h3><span class="role-pill">Creator &amp; Dev</span></div>
-          <div class="role-line">Creator &amp; Developer</div>
-          <div class="bio">Core architecture, streaming pipelines &amp; full-stack application engineering.</div>
-        </div>
-      </article>
-
-      <article class="profile">
-        <div class="avatar" style="background:linear-gradient(135deg,#334155,#0f172a)">KP<span class="verified">✓</span></div>
-        <div class="profile-main">
-          <div class="profile-top"><h3>Kundan Panriya <span class="vtick">☑</span></h3><span class="role-pill">Manager</span></div>
-          <div class="role-line">Manager &amp; Advisor</div>
-          <div class="bio">Product roadmap, quality standards &amp; strategic operational leadership.</div>
-        </div>
-      </article>
-
-      <article class="profile">
-        <div class="avatar" style="background:linear-gradient(135deg,#f59e0b,#b45309)">SK<span class="verified">✓</span></div>
-        <div class="profile-main">
-          <div class="profile-top"><h3>Sagar Khatri <span class="vtick">☑</span></h3><span class="role-pill">Developer</span></div>
-          <div class="role-line">Developer</div>
-          <div class="bio">Application feature development, system optimization &amp; multi-platform testing.</div>
-        </div>
-      </article>
-
-      <div class="built">Built with ❤️ to deliver lightning-fast, high-definition downloads for everyone.</div>
-    </section>
-
-
-    <!-- ============ DOWNLOAD PAGE ============ -->
-    <section class="view" id="view-download">
-      <div style="margin-top:20px">
-        <button class="back-btn" type="button" id="backHomeDownload">← &nbsp;Back to Home</button>
-      </div>
-      <div class="download-card">
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px"><img src="/logo.png" alt="EasySave logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover"><h2 id="downloadTitle">Video downloading</h2></div>
-        <div class="auto-hd">✓ Auto HD — 1080p Full HD • MP4<small>Quality select karne ki zaroorat nahi — best HD khud select ho gaya hai</small></div>
-        <div class="spinner-big" id="downloadSpinner" aria-label="Loading"></div>
-        <p class="download-status" id="downloadStatus">Video searching…</p>
-        <div class="done-box" id="downloadDone">✓ Done — download start ho raha hai…<small id="downloadDest"></small></div>
-      </div>
-    </section>
-
-  </main>
+  <p class="foot">YouTube • TikTok • Instagram • Facebook • X — paste a link, pick a format, save to Gallery.<br>Only download videos you own or have permission to download.<br>Private / login-walled / age-restricted videos cannot be downloaded by any downloader.</p>
 </div>
-
-<!-- Bottom dock -->
-<nav class="dock" aria-label="Main">
-  <button type="button" class="active" data-nav="home"><span class="dic">🏠</span>Home</button>
-  <button type="button" data-nav="paste"><span class="dic">📋</span>Paste</button>
-  <button type="button" data-nav="team"><span class="dic">👥</span>Team</button>
-  <button type="button" data-nav="apk"><span class="dic">🤖</span>App APK</button>
-</nav>
-
-<!-- Install sheet -->
-<div class="sheet-back" id="sheetBack">
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-    <h3 id="sheetTitle">Install EasySave</h3>
-    <p>Add EasySave to your home screen — it installs like a native app, free, with no watermark downloads and share-target support. Phone aur laptop dono par chalta hai.</p>
-    <ol>
-      <li><strong>Android phone (Chrome):</strong> tap <strong>⋮ menu → Install app / Add to Home screen</strong>.</li>
-      <li><strong>iPhone (Safari):</strong> tap <strong>Share → Add to Home Screen</strong>.</li>
-      <li><strong>Laptop / PC (Chrome ya Edge):</strong> address bar ke right side wala <strong>Install icon → Install</strong> dabao — EasySave desktop app ban jayega.</li>
-      <li>For a standalone <code>.apk</code>, wrap this same PWA with Bubblewrap (TWA) or Capacitor and link the file to this button.</li>
-    </ol>
-    <p><strong>Method 1 tip:</strong> install ke baad YouTube, TikTok, Instagram ya Facebook me <strong>Share → EasySave</strong> dabao — EasySave khud khulega, video search karega aur auto-download Gallery me shuru ho jayega.</p>
-    <p><strong>Method 2 tip:</strong> sirf link copy karo aur EasySave kholo — Paste dabate hi auto-loading ke saath download shuru ho jata hai.</p>
-    <button class="close-btn" type="button" id="sheetClose">Got it</button>
-  </div>
-</div>
+<nav><div class="row"><a href="/" class="on">🏠<br>Home</a><a href="#downloads">⬇️<br>Downloads</a><a href="https://pay.weblitex.com/">⭐<br>Premium</a></div></nav>
 
 <script>
-/* ============================================================
-   EasySave config — ads + extractor hooks
-   (mirrors src/config/adsConfig.js in the full project bundle)
-   ============================================================ */
-var AD_CONFIG = {
-  enabled: true,         // user-provided ad code inserted in #easysave-dynamic-ad-slot, 2026-11-03 night
-  html: "",              // ad scripts are placed directly in the slot div, so they execute on parse
-  scriptSrc: ""          // paste ad network script URL here (AdSense / Adsterra / Monetag / PropellerAds)
-};
-/* Optional extractor backend: set to your API base, e.g. "https://api.example.com/extract?url="
-   Leave empty to run in link-detection mode (direct .mp4/.mp3 links download in-browser). */
-var EXTRACTOR_API = "https://videos-downloader-app-production.up.railway.app";
-
-(function initAdSlot(){
-  var slot = document.getElementById('easysave-dynamic-ad-slot');
-  if(!AD_CONFIG.enabled){ slot.style.display = 'none'; return; }
-  slot.classList.add('on'); slot.style.display = 'block';
-  if(AD_CONFIG.html){ slot.innerHTML = AD_CONFIG.html; }
-  if(AD_CONFIG.scriptSrc){
-    var s = document.createElement('script'); s.async = true; s.src = AD_CONFIG.scriptSrc; slot.appendChild(s);
-  }
-})();
-
-/* ---------- helpers ---------- */
+var API = "https://videos-downloader-app-production.up.railway.app";
+var PAY = "https://pay.weblitex.com/";
+var lastUrl = "", lastTitle = "", lastData = null, queue = [];
 var $ = function(id){ return document.getElementById(id); };
-var urlInput = $('urlInput'), statusLine = $('statusLine');
-function setStatus(msg, cls){ statusLine.textContent = msg || ''; statusLine.className = 'status-line' + (cls ? ' ' + cls : ''); }
 
-function detectPlatform(u){
-  if(/youtu\.?be/.test(u)) return 'YouTube';
-  if(/tiktok\.com/.test(u)) return 'TikTok';
-  if(/instagram\.com/.test(u)) return 'Instagram';
-  if(/facebook\.com|fb\.watch/.test(u)) return 'Facebook';
-  if(/\.(mp4|webm)(\?|$)/i.test(u)) return 'Direct MP4';
-  if(/\.mp3(\?|$)/i.test(u)) return 'Direct MP3';
-  return null;
-}
-function highlightChip(name){
-  var chips = document.querySelectorAll('.chip');
-  for(var i=0;i<chips.length;i++){ chips[i].classList.toggle('active', chips[i].getAttribute('data-platform') === name); }
-}
+function platformOf(u){ u=u.toLowerCase(); if(u.indexOf("youtu")>-1) return "YouTube"; if(u.indexOf("instagram.com")>-1) return "Instagram"; if(u.indexOf("tiktok.com")>-1) return "TikTok"; if(u.indexOf("facebook.com")>-1||u.indexOf("fb.watch")>-1) return "Facebook"; if(u.indexOf("twitter.com")>-1||u.indexOf("x.com")>-1) return "X"; return "Video"; }
+function ytThumb(u){ var m=u.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/); return m ? "https://img.youtube.com/vi/"+m[1]+"/hqdefault.jpg" : ""; }
+function friendly(msg){ msg=(msg||"").toLowerCase();
+  if(msg.indexOf("private")>-1) return "This video is private. Only the owner can download it.";
+  if(msg.indexOf("login")>-1||msg.indexOf("sign in")>-1||msg.indexOf("age")>-1) return "This video needs a login or is age-restricted. Try a public video.";
+  if(msg.indexOf("429")>-1||msg.indexOf("bot")>-1||msg.indexOf("rate")>-1) return "The platform is blocking this server right now. Try again in a few minutes.";
+  return "Could not extract this video. Check the link and try a public video."; }
 
-/* ---------- clipboard ---------- */
-function readClipboard(){
-  if(navigator.clipboard && navigator.clipboard.readText){
-    return navigator.clipboard.readText();
-  }
-  return Promise.reject(new Error('clipboard-unavailable'));
-}
-function pasteFromClipboard(autoStart){
-  readClipboard().then(function(text){
-    text = (text || '').trim();
-    var m = text.match(/https?:\/\/[^\s]+/);
-    if(m){ urlInput.value = m[0]; onUrlChanged(); setStatus('Link pasted — ready to download.', 'ok'); if(autoStart){ startDownload(); } }
-    else if(text){ urlInput.value = text; setStatus('Pasted, but no video link was found in it.', 'error'); }
-    else { setStatus('Clipboard is empty — copy a video link first.', 'error'); urlInput.focus(); }
-  }).catch(function(){
-    setStatus('Tap the box and paste your link — clipboard access needs a tap in some browsers.', 'error');
-    urlInput.focus();
-  });
-}
-$('pasteBtn').addEventListener('click', function(){ pasteFromClipboard(true); });
-$('autoDetect').addEventListener('click', function(){ pasteFromClipboard(true); });
+async function checkClipboard(){ try{ var t=await navigator.clipboard.readText(); if(t && /^https?:\/\//.test(t.trim()) && !$("url").value) $("url").value=t.trim(); }catch(e){} }
+checkClipboard(); window.addEventListener("focus", checkClipboard);
+$("clear").onclick=function(){ $("url").value=""; $("url").focus(); };
 
-/* Method 2: pasting a link straight into the box auto-starts the download */
-urlInput.addEventListener('paste', function(){
-  setTimeout(function(){
-    var m = urlInput.value.match(/https?:\/\/[^\s]+/);
-    if(m){
-      urlInput.value = m[0]; onUrlChanged();
-      setStatus('Link mil gaya — auto download shuru ho raha hai…', 'ok');
-      setTimeout(startDownload, 450);
-    }
-  }, 60);
+$("form").addEventListener("submit", async function(e){
+  e.preventDefault(); var url=$("url").value.trim(); if(!url){ $("url").focus(); return; }
+  lastUrl=url; $("error").hidden=true; $("loading").hidden=false; $("get").disabled=true;
+  $("preview").hidden=true; $("formats").hidden=true;
+  try{
+    var res=await fetch(API+"/extract",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:url})});
+    var d=await res.json();
+    if(!res.ok || d.error) throw new Error(d.error||d.detail||"Extraction failed");
+    lastData=d; lastTitle=d.title||"Video";
+    var th=ytThumb(url);
+    $("thumb").src=th||""; $("thumb").alt=lastTitle; $("thumb").style.display=th?"block":"none";
+    $("title").textContent=lastTitle;
+    $("meta").textContent=platformOf(url)+" • MP4 with sound";
+    $("chips").innerHTML=["360p","720p","1080p","MP3","M4A"].map(function(c){return '<span class="chip">'+c+'</span>';}).join("");
+    $("preview").hidden=false;
+    var order={"Original":0,"1080p":0,"720p":1,"480p":2,"360p":3,"240p":4};
+    var fmts=(d.formats||[]).slice().sort(function(a,b){return (order[a.quality]??9)-(order[b.quality]??9);});
+    var label={Original:"1080p Full HD", "1080p":"1080p Full HD", "720p":"720p HD", "480p":"480p", "360p":"360p", "240p":"240p"};
+    var vg=$("videoGrid"); vg.innerHTML="";
+    var seen={};
+    fmts.forEach(function(f){ var l=label[f.quality]||f.quality; if(seen[l]) return; seen[l]=1;
+      var b=document.createElement("button"); b.className="fmt"; b.type="button";
+      b.innerHTML="<b>"+l+(l.indexOf("1080p")===0?' <span class="pro">HD</span>':"")+"</b><small>MP4 • with sound</small>";
+      b.onclick=function(){ startDownload(url, l); }; vg.appendChild(b); });
+    if(!vg.children.length){ var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.innerHTML="<b>1080p Full HD</b><small>MP4 • with sound</small>"; b.onclick=function(){ startDownload(url,"1080p Full HD"); }; vg.appendChild(b); }
+    var ag=$("audioGrid"); ag.innerHTML="";
+    ["MP3 128kbps","MP3 320kbps","M4A 128kbps","M4A 320kbps"].forEach(function(l){
+      var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.disabled=true;
+      b.innerHTML="<b>"+l+' <span class="soon">Soon</span></b><small>Audio-only • new API</small>';
+      b.onclick=function(){ showError("Audio-only download needs the new EasyDownloader API — video MP4 with sound works now."); };
+      ag.appendChild(b); });
+    $("formats").hidden=false;
+  }catch(err){ showError(friendly(err.message)); }
+  finally{ $("loading").hidden=true; $("get").disabled=false; }
 });
 
-/* Method 2 (hands-free): if clipboard permission is already granted, a copied
-   video link is picked up automatically when EasySave comes to the front. */
-var lastAutoUrl = '';
-function autoCheckClipboard(){
-  if(busy || !navigator.clipboard || !navigator.clipboard.readText || !navigator.permissions || !navigator.permissions.query) return;
-  navigator.permissions.query({name:'clipboard-read'}).then(function(st){
-    if(st.state !== 'granted') return;
-    navigator.clipboard.readText().then(function(text){
-      var m = (text || '').match(/https?:\/\/[^\s]+/);
-      if(m && detectPlatform(m[0]) && m[0] !== lastAutoUrl && m[0] !== urlInput.value.trim()){
-        lastAutoUrl = m[0]; urlInput.value = m[0]; onUrlChanged();
-        setStatus('Copied link mil gaya — auto download shuru ho raha hai…', 'ok');
-        startDownload();
-      }
-    }).catch(function(){});
-  }).catch(function(){});
+function showError(m){ var e=$("error"); e.textContent=m; e.hidden=false; }
+function addDownload(title, label){
+  $("downloads").hidden=false;
+  var d=document.createElement("div"); d.className="card";
+  d.innerHTML="<b style='font-size:14px'>"+escapeHtml(title)+"</b><div class='note'>"+escapeHtml(label)+"</div><div class='prog'><i></i></div><p class='note'>Downloading… check Downloads / Gallery › Videos</p>";
+  $("dlList").prepend(d); return d;
 }
-window.addEventListener('focus', autoCheckClipboard);
-document.addEventListener('visibilitychange', function(){ if(!document.hidden){ autoCheckClipboard(); } });
-
-function onUrlChanged(){
-  var p = detectPlatform(urlInput.value.trim());
-  highlightChip(p);
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function startDownload(url, label){
+  addDownload(lastTitle||"Video", label||"MP4");
+  var a=document.createElement("a"); a.href=API+"/download?url="+encodeURIComponent(url); a.download=""; document.body.appendChild(a); a.click(); a.remove();
 }
-urlInput.addEventListener('input', onUrlChanged);
-urlInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ startDownload(); } });
-
-var chipBtns = document.querySelectorAll('.chip');
-for(var c=0;c<chipBtns.length;c++){
-  chipBtns[c].addEventListener('click', function(){
-    highlightChip(this.getAttribute('data-platform'));
-    urlInput.focus();
-    setStatus(this.getAttribute('data-platform') + ' selected — paste a ' + this.getAttribute('data-platform') + ' link above.');
-  });
-}
-
-/* ---------- download flow ---------- */
-var busy = false;
-var pendingUrl = null;
-function startDownload(){
-  var raw = urlInput.value.trim();
-  var mq = raw.match(/https?:\/\/[^\s]+/);
-  if(busy){
-    /* Second link pasted/shared while the first is still in its loading
-       phase: do NOT drop it and do NOT restart the first one. Queue it
-       and start it automatically after the first download is triggered. */
-    if(mq){ pendingUrl = mq[0]; setStatus('Pehli video loading mein hai — dusri link queue mein lag gayi hai, pehli ke baad auto start hogi.', 'ok'); }
-    return;
-  }
-  if(!mq){ setStatus('Paste a YouTube, TikTok, Instagram or Facebook link first.', 'error'); urlInput.focus(); return; }
-  var url = mq[0];
-  var platform = detectPlatform(url);
-  if(!platform){ setStatus('That link is not from a supported platform.', 'error'); return; }
-  highlightChip(platform);
-  /* New design: paste/share goes to a dedicated download page, not the home result card */
-  $('downloadTitle').textContent = platform + ' video';
-  $('downloadDone').style.display = 'none';
-  $('downloadStatus').style.display = 'block'; $('downloadStatus').className = 'download-status';
-  $('downloadSpinner').style.display = 'block';
-  showView('download');
-  busy = true;
-  var btn = $('downloadBtn'), label = $('dlLabel');
-  btn.disabled = true; $('dlSpinner').style.display = 'block'; $('dlIco').style.display = 'none';
-  $('resultCard').classList.remove('show');
-  var wrap = $('progressWrap'), bar = $('progressBar');
-  wrap.style.display = 'block'; bar.style.width = '0%';
-  var steps = [platform + ' link mil gaya…','Video searching…','1080p HD auto select ho raha hai…','Gallery ke liye HD file tayyar ho rahi hai…'];
-  var pct = 0, si = 0;
-  setStatus(steps[0]);
-  var timer = setInterval(function(){
-    pct = Math.min(100, pct + Math.random()*16 + 6);
-    bar.style.width = pct + '%';
-    label.textContent = 'Downloading… ' + Math.floor(pct) + '%';
-    var nsi = Math.min(steps.length-1, Math.floor(pct/28));
-    if(nsi !== si){ si = nsi; setStatus(steps[si]); $('downloadStatus').textContent = steps[si]; }
-    if(pct >= 100){
-      clearInterval(timer);
-      busy = false; btn.disabled = false;
-      $('dlSpinner').style.display = 'none'; $('dlIco').style.display = 'grid';
-      label.textContent = 'Download Video';
-      setTimeout(function(){ wrap.style.display = 'none'; }, 400);
-      showResult(url, platform);
-    }
-  }, 260);
-}
-
-function showResult(url, platform){
-  var isDirect = (platform === 'Direct MP4' || platform === 'Direct MP3');
-  $('resultTitle').textContent = platform + ' video found';
-  $('resultMeta').textContent = url;
-  /* No quality picker: 1080p Full HD MP4 is auto-selected for every video.
-     The old quality grid stays empty and hidden — nothing to tap or choose. */
-  var grid = $('qualityGrid'); grid.innerHTML = ''; grid.hidden = true;
-  var badge = $('autoHdBadge');
-  if(badge){
-    badge.innerHTML = isDirect
-      ? '✓ Auto Download — Original file • ' + (platform === 'Direct MP3' ? 'MP3' : 'MP4') + '<small>Select karne ki zaroorat nahi — download khud shuru ho raha hai</small>'
-      : '✓ Auto HD — 1080p Full HD • MP4<small>Quality select karne ki zaroorat nahi — best HD khud select ho gaya hai</small>';
-  }
-  /* Download page: spinner stops, Done shows, then the browser download starts */
-  lastDownloadUrl = url; lastDownloadPlatform = platform;
-  $('downloadSpinner').style.display = 'none';
-  /* Done box hi kaafi hai — status line mein wahi Done dobara nahi dikhana */
-  $('downloadStatus').style.display = 'none';
-  $('downloadDest').textContent = downloadDestText();
-  $('downloadDone').style.display = 'block';
-  /* Auto-download for every platform — no second tap, no quality selection */
-  setStatus('Video mil gaya — 1080p HD auto-download shuru…', 'ok');
-  var autoQuality = isDirect ? 'Original file' : '1080p Full HD';
-  setTimeout(function(){ saveFile(url, platform, autoQuality); }, 500);
-}
-
-function triggerAnchorDownload(href, filename){
-  var a = document.createElement('a');
-  a.href = href; a.download = filename;
-  a.setAttribute('download', filename);
-  document.body.appendChild(a); a.click(); a.remove();
-}
-function saveFile(url, platform, quality){
-  lastDownloadUrl = url; lastDownloadPlatform = platform; lastDownloadQuality = quality;
-  var isAudio = /MP3/i.test(quality);
-  var ext = isAudio ? 'mp3' : 'mp4';
-  var filename = 'EasySave_' + Date.now() + '.' + ext;
-  if(EXTRACTOR_API){
-    triggerAnchorDownload(EXTRACTOR_API + '/download?url=' + encodeURIComponent(url), filename);
-    setStatus('Saving ' + quality + ' as ' + filename + '…', 'ok');
-    /* Download started in the browser, so clear the pasted link now:
-       the old link must not block the next paste, and clipboard
-       auto-detect must not re-add this same link on focus. */
-    urlInput.value = ''; lastAutoUrl = url; highlightChip(null); $('resultCard').classList.remove('show'); $('downloadDest').textContent = downloadDestText(); $('downloadDone').style.display = 'block';
-    if(pendingUrl){ var nextUrl = pendingUrl; pendingUrl = null; setTimeout(function(){ urlInput.value = nextUrl; startDownload(); }, 1200); }
-    return;
-  }
-  if(platform === 'Direct MP4' || platform === 'Direct MP3'){
-    setStatus('Saving ' + filename + '…', 'ok');
-    fetch(url).then(function(r){ return r.blob(); }).then(function(blob){
-      var obj = URL.createObjectURL(new Blob([blob], {type: isAudio ? 'audio/mpeg' : 'video/mp4'}));
-      triggerAnchorDownload(obj, filename);
-      urlInput.value = ''; lastAutoUrl = url; highlightChip(null); $('resultCard').classList.remove('show'); $('downloadDest').textContent = downloadDestText(); $('downloadDone').style.display = 'block';
-      if(pendingUrl){ var nextUrl = pendingUrl; pendingUrl = null; setTimeout(function(){ urlInput.value = nextUrl; startDownload(); }, 1200); }
-      setTimeout(function(){ URL.revokeObjectURL(obj); }, 4000);
-    }).catch(function(){ triggerAnchorDownload(url, filename); urlInput.value = ''; lastAutoUrl = url; highlightChip(null); $('resultCard').classList.remove('show'); $('downloadDest').textContent = downloadDestText(); $('downloadDone').style.display = 'block'; if(pendingUrl){ var nextUrl = pendingUrl; pendingUrl = null; setTimeout(function(){ urlInput.value = nextUrl; startDownload(); }, 1200); } });
-    return;
-  }
-  setStatus('Video download shuru ho raha hai…', 'ok');
-  urlInput.value = ''; lastAutoUrl = url; highlightChip(null); $('resultCard').classList.remove('show'); $('downloadDest').textContent = downloadDestText(); $('downloadDone').style.display = 'block';
-  if(pendingUrl){ var nextUrl = pendingUrl; pendingUrl = null; setTimeout(function(){ urlInput.value = nextUrl; startDownload(); }, 1200); }
-}
-$('downloadBtn').addEventListener('click', startDownload);
-
-/* ---------- Method 1: share target — /?url=... / ?text=... / ?title=... ----------
-   User taps Share in YouTube / TikTok / Instagram / Facebook, picks EasySave,
-   and the app opens here, searches the video and auto-starts the download. */
-(function handleShareTarget(){
-  try{
-    var q = new URLSearchParams(window.location.search);
-    var parts = [q.get('url'), q.get('text'), q.get('link'), q.get('title')];
-    for(var i=0;i<parts.length;i++){
-      if(!parts[i]) continue;
-      var m = parts[i].match(/https?:\/\/[^\s]+/);
-      if(m){
-        lastAutoUrl = m[0];
-        urlInput.value = m[0]; onUrlChanged();
-        setStatus('Share se link aa gaya — video searching, auto download shuru…', 'ok');
-        setTimeout(startDownload, 500);
-        return;
-      }
-    }
-  }catch(e){}
-})();
-
-/* ---------- method cards ---------- */
-
-/* ---------- views / navigation ---------- */
-/* ---------- download page ---------- */
-function isPhoneDevice(){ return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || ''); }
-function downloadDestText(){
-  var ua = navigator.userAgent || '';
-  if(/iPhone|iPad|iPod/i.test(ua)) return 'iPhone: download ke baad Save to Photos / Files ka ek step aayega.';
-  if(/Android/i.test(ua)) return 'Phone: file browser ke Downloads mein save hogi, aur Gallery > Videos mein nazar aayegi.';
-  return 'Laptop / PC: file aapke browser ke Downloads folder mein save hogi.';
-}
-var lastDownloadUrl = '', lastDownloadPlatform = '', lastDownloadQuality = '';
-function goHomeForNewVideo(){
-  urlInput.value = ''; lastAutoUrl = '';
-  $('downloadDone').style.display = 'none';
-  showView('home'); urlInput.focus();
-}
-function showView(name){
-  $('view-home').classList.toggle('active', name === 'home');
-  $('view-team').classList.toggle('active', name === 'team');
-  $('view-download').classList.toggle('active', name === 'download');
-  var navs = document.querySelectorAll('.dock button');
-  for(var i=0;i<navs.length;i++){
-    var n = navs[i].getAttribute('data-nav');
-    navs[i].classList.toggle('active', n === name || (name === 'home' && n === 'home'));
-  }
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-var navBtns = document.querySelectorAll('.dock button');
-for(var n=0;n<navBtns.length;n++){
-  navBtns[n].addEventListener('click', function(){
-    var act = this.getAttribute('data-nav');
-    if(act === 'home'){ showView('home'); }
-    else if(act === 'team'){ showView('team'); }
-    else if(act === 'paste'){ showView('home'); pasteFromClipboard(true); }
-    else if(act === 'apk'){ openInstall(); }
-  });
-}
-$('backHome').addEventListener('click', function(){ showView('home'); });
-$('backHomeDownload').addEventListener('click', goHomeForNewVideo);
-$('loveBtn').addEventListener('click', function(){ showView('team'); });
-
-/* ---------- FB toast ---------- */
-
-/* ---------- PWA install (beforeinstallprompt) ---------- */
-var deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; });
-function openInstall(){
-  if(deferredPrompt){
-    var showInstall = deferredPrompt.prompt;
-    showInstall.call(deferredPrompt);
-    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; });
-  } else {
-    $('sheetBack').classList.add('show');
-  }
-}
-var apkBtns = document.querySelectorAll('[data-apk]');
-for(var a=0;a<apkBtns.length;a++){ apkBtns[a].addEventListener('click', openInstall); }
-$('sheetClose').addEventListener('click', function(){ $('sheetBack').classList.remove('show'); });
-$('sheetBack').addEventListener('click', function(e){ if(e.target === this){ this.classList.remove('show'); } });
-</script>
-<script>if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('/sw.js').catch(function(){}); }); }</script>
-<script>
-// Cross-promo ad cycle: banner dikhe, phir chhup jaye, phir dobara aaye (loop)
-(function(){
-  var p = document.getElementById('crossPromo');
-  if (!p) return;
-  setInterval(function(){
-    p.style.display = (p.style.display === 'none') ? '' : 'none';
-  }, 6000);
-})();
+$("addQueue").onclick=function(){ if(!lastUrl) return; queue.push({url:lastUrl,title:lastTitle}); renderQueue(); };
+function renderQueue(){ $("queueBox").hidden=!queue.length; $("qCount").textContent=queue.length;
+  $("qList").innerHTML=queue.map(function(q,i){return "<div>"+(i+1)+". "+escapeHtml(q.title)+"</div>";}).join(""); }
+$("qClear").onclick=function(){ queue=[]; renderQueue(); };
+$("dlAll").onclick=function(){ queue.forEach(function(q,i){ setTimeout(function(){ lastTitle=q.title; startDownload(q.url,"MP4 (batch)"); }, i*1200); }); };
 </script>
 </body>
 </html>
