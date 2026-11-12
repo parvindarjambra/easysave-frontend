@@ -17,7 +17,7 @@
      Logo and work stay EasyDownloader; only the colors come from EasySave. */
   :root{--blue:#0b5cff;--blue2:#2563eb;--blue-dark:#0a2a7a;--ink:#0f172a;--muted:#64748b;--muted2:#94a3b8;--line:#e6ebf2;--bg:#edf1f5;--card:#ffffff;--mint-bg:#d9fbe9;--mint-text:#0a7a4b;--mint-border:#a7ecc9;--radius:24px}
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:720px;margin:0 auto;padding:16px 16px 96px}
+  .wrap{max-width:720px;margin:0 auto;padding:16px 16px 24px}
   header{display:flex;align-items:center;gap:12px;padding:4px 0 16px}
   h1{font-size:20px;margin:0;line-height:1} h1 span{color:var(--blue)} .sub{font-size:12px;color:var(--muted);margin-top:4px}
   .bar{display:flex;gap:8px} .bar .in{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px}
@@ -123,14 +123,8 @@
     <script src="https://bauval.org/22/a1f52b6f3fa444c3c9cfae05962d6c16"></script>
   </div>
 
-  <section id="downloads" hidden>
-    <h2>Downloads</h2>
-    <div id="dlList"></div>
-  </section>
-
   <p class="foot">YouTube • TikTok • Instagram • Facebook • X — paste a link, pick a format, save to Gallery.<br>100% free, no login, no subscription, no premium.<br>Only download videos you own or have permission to download.<br>Private / login-walled / age-restricted videos cannot be downloaded by any downloader.</p>
 </div>
-<nav><div class="row" style="grid-template-columns:1fr 1fr"><a href="/" class="on">🏠<br>Home</a><a href="#downloads">⬇️<br>Downloads</a></div></nav>
 
 <script>
 var API = "https://videos-downloader-app-production.up.railway.app";
@@ -237,15 +231,8 @@ $("installBtn").onclick=function(){
   if(deferredInstall){ deferredInstall.prompt(); deferredInstall.userChoice.then(function(){ deferredInstall=null; }); }
   else { showToast("App install karo", "Browser ke menu (⋮) mein jaa kar 'Install app' ya 'Add to Home screen' dabao. iPhone par Share → Add to Home Screen."); }
 };
-function addDownload(title, label){
-  $("downloads").hidden=false;
-  var d=document.createElement("div"); d.className="card";
-  d.innerHTML="<b style='font-size:14px'>"+escapeHtml(title)+"</b><div class='note'>"+escapeHtml(label)+"</div><div class='prog'><i></i></div><p class='note'>Downloading… check Downloads / Gallery › Videos</p>";
-  $("dlList").prepend(d); return d;
-}
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
 function startDownload(url, label, formatId){
-  addDownload(lastTitle||"Video", label||"MP4");
   var href=API+"/download?url="+encodeURIComponent(url);
   if(formatId) href+="&format="+encodeURIComponent(formatId);
   var a=document.createElement("a"); a.href=href; a.download=""; document.body.appendChild(a); a.click(); a.remove();
