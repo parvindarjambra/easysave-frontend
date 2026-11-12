@@ -56,6 +56,7 @@
   <header>
     <svg width="40" height="40" viewBox="0 0 256 256" role="img" aria-label="EasyDownloader logo"><defs><linearGradient id="y" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD700"/><stop offset="1" stop-color="#FFC107"/></linearGradient></defs><rect x="8" y="8" width="240" height="240" rx="56" fill="#121212" stroke="#FFD700" stroke-opacity=".25" stroke-width="2"/><circle cx="128" cy="118" r="62" fill="none" stroke="url(#y)" stroke-width="10"/><path d="M112 88 L162 118 L112 148 Z" fill="url(#y)"/><path d="M128 138 v44" stroke="#FFD700" stroke-width="12" stroke-linecap="round"/><path d="M106 160 L128 184 L150 160" fill="none" stroke="#FFD700" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><g stroke="url(#y)" stroke-width="7" stroke-linecap="round"><line x1="70" y1="106" x2="70" y2="130"/><line x1="186" y1="106" x2="186" y2="130"/></g><path d="M72 196 h112" stroke="#FFD700" stroke-width="8" stroke-linecap="round"/></svg>
     <div><h1>Easy<span>Downloader</span></h1><div class="sub">Fast • Free • No login</div></div>
+    <button class="btn dark" id="installBtn" type="button" style="margin-left:auto;padding:10px 14px;white-space:nowrap">⬇️ Install App</button>
   </header>
 
   <form id="form" class="bar">
@@ -223,6 +224,19 @@ $("form").addEventListener("submit", async function(e){
 function showError(m){ var e=$("error"); e.textContent=m; e.hidden=false; $("retry").hidden=false; }
 $("retry").onclick=function(){ $("retry").hidden=true; $("error").hidden=true; $("form").dispatchEvent(new Event("submit",{cancelable:true})); };
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("/sw.js").catch(function(){}); }
+// PWA install: Chrome/Android fires beforeinstallprompt; iPhone Safari does
+// not, so there the button shows the manual steps instead.
+var deferredInstall=null;
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredInstall=e; });
+window.addEventListener("appinstalled", function(){ deferredInstall=null; $("installBtn").style.display="none"; });
+function showToast(title, msg){
+  $("toast").innerHTML="<b style='font-size:14px;color:var(--mint-text)'>"+title+"</b><p class='note' style='margin-top:4px'>"+msg+"</p>";
+  $("toast").hidden=false; setTimeout(function(){ $("toast").hidden=true; }, 6000);
+}
+$("installBtn").onclick=function(){
+  if(deferredInstall){ deferredInstall.prompt(); deferredInstall.userChoice.then(function(){ deferredInstall=null; }); }
+  else { showToast("App install karo", "Browser ke menu (⋮) mein jaa kar 'Install app' ya 'Add to Home screen' dabao. iPhone par Share → Add to Home Screen."); }
+};
 function addDownload(title, label){
   $("downloads").hidden=false;
   var d=document.createElement("div"); d.className="card";
@@ -241,7 +255,7 @@ function startDownload(url, label, formatId){
   lastAutoUrl=url; hideAutoCard();
   setTimeout(function(){
     $("preview").hidden=true; $("formats").hidden=true; $("url").value="";
-    $("toast").hidden=false; setTimeout(function(){ $("toast").hidden=true; }, 6000);
+    showToast("Download shuru ho gaya ✓", "File Downloads / Gallery › Videos mein aa rahi hai. Naya link paste karo.");
     $("url").focus();
   }, 4000);
 }
