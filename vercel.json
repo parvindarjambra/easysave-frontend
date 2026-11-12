@@ -1,17 +1,1 @@
-{
-  "redirects": [
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "easysavehd.vercel.app" }],
-      "destination": "https://easysave.weblitex.com/",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "easysavehd.vercel.app" }],
-      "destination": "https://easysave.weblitex.com/:path*",
-      "permanent": true
-    }
-  ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-}
+{"redirects":[{"destination":"https://easydownloader.weblitex.com/","has":[{"type":"host","value":"easysavehd.vercel.app"}],"permanent":true,"source":"/"},{"destination":"https://easydownloader.weblitex.com/:path*","has":[{"type":"host","value":"easysavehd.vercel.app"}],"permanent":true,"source":"/:path*"},{"destination":"https://easydownloader.weblitex.com/","has":[{"type":"host","value":"easysave.weblitex.com"}],"permanent":true,"source":"/"},{"destination":"https://easydownloader.weblitex.com/:path*","has":[{"type":"host","value":"easysave.weblitex.com"}],"permanent":true,"source":"/:path*"}],"rewrites":[{"destination":"/index.html","source":"/(.*)"}]}
