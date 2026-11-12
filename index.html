@@ -137,7 +137,10 @@ window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); 
 <script>
 var API = "https://videos-downloader-app-production.up.railway.app";
 var lastUrl = "", lastTitle = "", lastData = null, queue = [];
-var lastAutoUrl = "", pendingAutoUrl = "", autoDownloadAfterExtract = false;
+var lastAutoUrl = "", pendingAutoUrl = "";
+// Snaptube flow: the copied link auto-shows with a Download button, but
+// tapping it only extracts and SHOWS the choices (Video 360/720/1080 or
+// Audio MP3/M4A) — it never auto-downloads. The user always picks first.
 
 function findUrlIn(s){ var m=(s||"").match(/https?:\/\/[^\s"'<>]+/); return m?m[0]:""; }
 function showAutoCard(url){
@@ -158,10 +161,11 @@ function friendly(msg){ msg=(msg||"").toLowerCase();
 async function checkClipboard(){ try{ var t=await navigator.clipboard.readText(); var u=findUrlIn(t); if(u && u!==lastAutoUrl){ if(!$("url").value) $("url").value=u; showAutoCard(u); } }catch(e){} }
 checkClipboard(); window.addEventListener("focus", checkClipboard);
 // Share target: Share -> EasyDownloader from Facebook/YouTube/TikTok opens /?url=... or ?text=...
-(function(){ try{ var q=new URLSearchParams(location.search); var u=findUrlIn(q.get("url")||"")||findUrlIn(q.get("text")||"")||findUrlIn(q.get("title")||""); if(u){ $("url").value=u; showAutoCard(u); autoDownloadAfterExtract=true; setTimeout(function(){ $("form").dispatchEvent(new Event("submit",{cancelable:true})); }, 400); } }catch(e){} })();
+// It only extracts and shows the Video / Audio + quality choices — never auto-downloads.
+(function(){ try{ var q=new URLSearchParams(location.search); var u=findUrlIn(q.get("url")||"")||findUrlIn(q.get("text")||"")||findUrlIn(q.get("title")||""); if(u){ $("url").value=u; showAutoCard(u); setTimeout(function(){ $("form").dispatchEvent(new Event("submit",{cancelable:true})); }, 400); } }catch(e){} })();
 $("clear").onclick=function(){ $("url").value=""; hideAutoCard(); $("url").focus(); };
 $("autoX").onclick=function(){ if(pendingAutoUrl) lastAutoUrl=pendingAutoUrl; hideAutoCard(); };
-$("autoDl").onclick=function(){ if(!pendingAutoUrl) return; $("url").value=pendingAutoUrl; autoDownloadAfterExtract=true; hideAutoCard(); $("form").dispatchEvent(new Event("submit",{cancelable:true})); };
+$("autoDl").onclick=function(){ if(!pendingAutoUrl) return; $("url").value=pendingAutoUrl; hideAutoCard(); $("form").dispatchEvent(new Event("submit",{cancelable:true})); };
 
 $("form").addEventListener("submit", async function(e){
   e.preventDefault(); var url=$("url").value.trim(); if(!url){ $("url").focus(); return; }
@@ -185,11 +189,9 @@ $("form").addEventListener("submit", async function(e){
     var isNew = d.formats && d.formats.length && d.formats[0].id;
     var vg=$("videoGrid"); vg.innerHTML="";
     var ag=$("audioGrid"); ag.innerHTML="";
-    var bestVideoId=null, bestVideoLabel="1080p Full HD";
     if(isNew){
       d.formats.forEach(function(f){
         if(f.kind==="video"){
-          if(f.id==="v1080"){ bestVideoId=f.id; bestVideoLabel=f.label; }
           var b=document.createElement("button"); b.className="fmt"; b.type="button";
           b.innerHTML="<b>"+escapeHtml(f.label)+"</b><small>MP4 • with sound • free</small>";
           (function(fid,fl){ b.onclick=function(){ startDownload(url, fl, fid); }; })(f.id, f.label);
@@ -218,7 +220,8 @@ $("form").addEventListener("submit", async function(e){
     }
     if(!vg.children.length){ var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.innerHTML="<b>1080p Full HD</b><small>MP4 • with sound</small>"; b.onclick=function(){ startDownload(url,"1080p Full HD"); }; vg.appendChild(b); }
     $("formats").hidden=false;
-    if(autoDownloadAfterExtract){ autoDownloadAfterExtract=false; startDownload(url, bestVideoLabel, bestVideoId); }
+    // Snaptube flow: stop here and let the user pick Video / Audio + quality.
+    // Never auto-download after extract.
   }catch(err){ showError(friendly(err.message)); }
   finally{ $("loading").hidden=true; $("get").disabled=false; }
 });
