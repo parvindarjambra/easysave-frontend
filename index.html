@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#121212">
 <meta name="description" content="EasyDownloader — download YouTube, TikTok, Instagram, Facebook and X videos in 360p, 720p, 1080p and MP3 / M4A audio. Free, no login.">
 <link rel="icon" href="/logo.svg">
+<link rel="apple-touch-icon" href="/logo.svg">
+<link rel="manifest" href="/manifest.json">
 <title>EasyDownloader — HD Video &amp; Audio Downloader</title>
 <style>
   :root{--bg:#121212;--card:#1E1E1E;--yellow:#FFD700;--amber:#FFC107;--muted:#9CA3AF;--line:#2A2A2A}
@@ -56,6 +58,7 @@
   <p class="note">Copied a link? Open this page and it appears automatically. Tap Get, pick a format, and the file saves to Downloads / Gallery › Videos.</p>
 
   <div id="error" class="alert" role="alert" hidden></div>
+  <button class="btn" id="retry" type="button" style="width:100%;padding:12px;margin-top:10px" hidden>Try again</button>
   <p id="loading" class="note" style="text-align:center" hidden>Finding formats…</p>
 
   <section id="preview" class="card" hidden>
@@ -83,23 +86,20 @@
   </section>
 
   <section class="banner">
-    <div><b>Go Premium — 4K, batch &amp; ad-free</b><p>Unlimited high-speed 1080p / 4K downloads.</p></div>
-    <a class="btn dark" href="https://pay.weblitex.com/" style="text-decoration:none;padding:10px 16px;white-space:nowrap">Upgrade</a>
+    <div><b>100% Free — no login, no subscription</b><p>Every format, every video, free. Just like Snaptube.</p></div>
   </section>
-  <p class="note">Premium checkout runs only on <b>pay.weblitex.com</b>. That subdomain still needs its DNS record (CNAME <code>pay</code>) — ask your friend who controls Cloudflare for weblitex.com.</p>
 
   <section id="downloads" hidden>
     <h2>Downloads</h2>
     <div id="dlList"></div>
   </section>
 
-  <p class="foot">YouTube • TikTok • Instagram • Facebook • X — paste a link, pick a format, save to Gallery.<br>Only download videos you own or have permission to download.<br>Private / login-walled / age-restricted videos cannot be downloaded by any downloader.</p>
+  <p class="foot">YouTube • TikTok • Instagram • Facebook • X — paste a link, pick a format, save to Gallery.<br>100% free, no login, no subscription, no premium.<br>Only download videos you own or have permission to download.<br>Private / login-walled / age-restricted videos cannot be downloaded by any downloader.</p>
 </div>
-<nav><div class="row"><a href="/" class="on">🏠<br>Home</a><a href="#downloads">⬇️<br>Downloads</a><a href="https://pay.weblitex.com/">⭐<br>Premium</a></div></nav>
+<nav><div class="row" style="grid-template-columns:1fr 1fr"><a href="/" class="on">🏠<br>Home</a><a href="#downloads">⬇️<br>Downloads</a></div></nav>
 
 <script>
 var API = "https://videos-downloader-app-production.up.railway.app";
-var PAY = "https://pay.weblitex.com/";
 var lastUrl = "", lastTitle = "", lastData = null, queue = [];
 var $ = function(id){ return document.getElementById(id); };
 
@@ -108,7 +108,7 @@ function ytThumb(u){ var m=u.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/); re
 function friendly(msg){ msg=(msg||"").toLowerCase();
   if(msg.indexOf("private")>-1) return "This video is private. Only the owner can download it.";
   if(msg.indexOf("login")>-1||msg.indexOf("sign in")>-1||msg.indexOf("age")>-1) return "This video needs a login or is age-restricted. Try a public video.";
-  if(msg.indexOf("429")>-1||msg.indexOf("bot")>-1||msg.indexOf("rate")>-1) return "The platform is blocking this server right now. Try again in a few minutes.";
+  if(msg.indexOf("429")>-1||msg.indexOf("bot")>-1||msg.indexOf("rate")>-1||msg.indexOf("blocked")>-1) return "YouTube is blocking our server for this video right now (bot-check). Some videos still work — try another video, or try again later.";
   return "Could not extract this video. Check the link and try a public video."; }
 
 async function checkClipboard(){ try{ var t=await navigator.clipboard.readText(); if(t && /^https?:\/\//.test(t.trim()) && !$("url").value) $("url").value=t.trim(); }catch(e){} }
@@ -137,7 +137,7 @@ $("form").addEventListener("submit", async function(e){
     var seen={};
     fmts.forEach(function(f){ var l=label[f.quality]||f.quality; if(seen[l]) return; seen[l]=1;
       var b=document.createElement("button"); b.className="fmt"; b.type="button";
-      b.innerHTML="<b>"+l+(l.indexOf("1080p")===0?' <span class="pro">HD</span>':"")+"</b><small>MP4 • with sound</small>";
+      b.innerHTML="<b>"+l+"</b><small>MP4 • with sound • free</small>";
       b.onclick=function(){ startDownload(url, l); }; vg.appendChild(b); });
     if(!vg.children.length){ var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.innerHTML="<b>1080p Full HD</b><small>MP4 • with sound</small>"; b.onclick=function(){ startDownload(url,"1080p Full HD"); }; vg.appendChild(b); }
     var ag=$("audioGrid"); ag.innerHTML="";
@@ -151,7 +151,9 @@ $("form").addEventListener("submit", async function(e){
   finally{ $("loading").hidden=true; $("get").disabled=false; }
 });
 
-function showError(m){ var e=$("error"); e.textContent=m; e.hidden=false; }
+function showError(m){ var e=$("error"); e.textContent=m; e.hidden=false; $("retry").hidden=false; }
+$("retry").onclick=function(){ $("retry").hidden=true; $("error").hidden=true; $("form").dispatchEvent(new Event("submit",{cancelable:true})); };
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("/sw.js").catch(function(){}); }
 function addDownload(title, label){
   $("downloads").hidden=false;
   var d=document.createElement("div"); d.className="card";
