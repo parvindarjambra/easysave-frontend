@@ -11,6 +11,14 @@
 <link rel="icon" href="/logo.svg">
 <link rel="apple-touch-icon" href="/logo.svg">
 <link rel="manifest" href="/manifest.json">
+<script>
+// Install-prompt listener FIRST: Chrome can fire beforeinstallprompt before
+// the body script runs (service worker + manifest already cached, or the
+// synchronous ad script delaying parsing) — with no listener attached yet,
+// the event is lost and the Install button can only show the manual steps.
+window.deferredInstall = null;
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); window.deferredInstall = e; });
+</script>
 <title>EasyDownloader — HD Video &amp; Audio Downloader</title>
 <style>
   /* EasySave theme (user asked: same design color as EasySave) — light blue.
@@ -218,17 +226,16 @@ $("form").addEventListener("submit", async function(e){
 function showError(m){ var e=$("error"); e.textContent=m; e.hidden=false; $("retry").hidden=false; }
 $("retry").onclick=function(){ $("retry").hidden=true; $("error").hidden=true; $("form").dispatchEvent(new Event("submit",{cancelable:true})); };
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("/sw.js").catch(function(){}); }
-// PWA install: Chrome/Android fires beforeinstallprompt; iPhone Safari does
-// not, so there the button shows the manual steps instead.
-var deferredInstall=null;
-window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredInstall=e; });
-window.addEventListener("appinstalled", function(){ deferredInstall=null; $("installBtn").style.display="none"; });
+// PWA install: the beforeinstallprompt listener lives in <head> (see above)
+// so the event is never missed; iPhone Safari does not fire it at all, so
+// there the button shows the manual steps instead.
+window.addEventListener("appinstalled", function(){ window.deferredInstall=null; $("installBtn").style.display="none"; });
 function showToast(title, msg){
   $("toast").innerHTML="<b style='font-size:14px;color:var(--mint-text)'>"+title+"</b><p class='note' style='margin-top:4px'>"+msg+"</p>";
   $("toast").hidden=false; setTimeout(function(){ $("toast").hidden=true; }, 6000);
 }
 $("installBtn").onclick=function(){
-  if(deferredInstall){ deferredInstall.prompt(); deferredInstall.userChoice.then(function(){ deferredInstall=null; }); }
+  if(window.deferredInstall){ window.deferredInstall.prompt(); window.deferredInstall.userChoice.then(function(){ window.deferredInstall=null; }); }
   else { showToast("App install karo", "Browser ke menu (⋮) mein jaa kar 'Install app' ya 'Add to Home screen' dabao. iPhone par Share → Add to Home Screen."); }
 };
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
