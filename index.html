@@ -3,45 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#121212">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#0066FF">
 <meta name="description" content="EasyDownloader — download YouTube, TikTok, Instagram, Facebook and X videos in 360p, 720p, 1080p and MP3 / M4A audio. Free, no login.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="/logo.svg">
 <link rel="apple-touch-icon" href="/logo.svg">
 <link rel="manifest" href="/manifest.json">
 <title>EasyDownloader — HD Video &amp; Audio Downloader</title>
 <style>
-  :root{--bg:#121212;--card:#1E1E1E;--yellow:#FFD700;--amber:#FFC107;--muted:#9CA3AF;--line:#2A2A2A}
-  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  /* EasySave theme (user asked: same design color as EasySave) — light blue.
+     Logo and work stay EasyDownloader; only the colors come from EasySave. */
+  :root{--blue:#0b5cff;--blue2:#2563eb;--blue-dark:#0a2a7a;--ink:#0f172a;--muted:#64748b;--muted2:#94a3b8;--line:#e6ebf2;--bg:#edf1f5;--card:#ffffff;--mint-bg:#d9fbe9;--mint-text:#0a7a4b;--mint-border:#a7ecc9;--radius:24px}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:720px;margin:0 auto;padding:16px 16px 96px}
   header{display:flex;align-items:center;gap:12px;padding:4px 0 16px}
-  h1{font-size:20px;margin:0;line-height:1} h1 span{color:var(--yellow)} .sub{font-size:12px;color:var(--muted);margin-top:4px}
+  h1{font-size:20px;margin:0;line-height:1} h1 span{color:var(--blue)} .sub{font-size:12px;color:var(--muted);margin-top:4px}
   .bar{display:flex;gap:8px} .bar .in{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px}
-  .bar input{flex:1;background:transparent;border:0;color:#fff;padding:14px 0;font-size:14px;outline:none;min-width:0}
-  .bar input::placeholder{color:#6B7280}
-  .btn{background:var(--yellow);color:#121212;border:0;border-radius:16px;padding:0 20px;font-weight:800;cursor:pointer}
-  .btn:disabled{opacity:.6} .btn.dark{background:#121212;color:#fff;border:1px solid var(--line)}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}
-  .alert{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:12px;padding:12px;font-size:14px;margin-top:14px}
+  .bar input{flex:1;background:transparent;border:0;color:var(--ink);padding:14px 0;font-size:14px;outline:none;min-width:0}
+  .bar input::placeholder{color:#94a3b8}
+  .btn{background:var(--blue);color:#fff;border:0;border-radius:16px;padding:0 20px;font-weight:800;cursor:pointer}
+  .btn:disabled{opacity:.6} .btn.dark{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-top:14px}
+  .alert{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:12px;padding:12px;font-size:14px;margin-top:14px}
   .note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
   .thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000;display:block}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-  .fmt{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left;color:#fff;cursor:pointer}
-  .fmt:hover{border-color:var(--yellow)} .fmt b{display:block} .fmt small{color:var(--muted)}
-  .pro{font-size:11px;background:var(--yellow);color:#000;border-radius:999px;padding:2px 8px;font-weight:800;margin-left:6px}
-  .soon{font-size:11px;background:#374151;color:#fff;border-radius:999px;padding:2px 8px;font-weight:700;margin-left:6px}
+  .fmt{background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left;color:var(--ink);cursor:pointer}
+  .fmt:hover{border-color:var(--blue)} .fmt b{display:block} .fmt small{color:var(--muted)}
+  .pro{font-size:11px;background:var(--blue);color:#fff;border-radius:999px;padding:2px 8px;font-weight:800;margin-left:6px}
+  .soon{font-size:11px;background:#e6ebf2;color:var(--muted);border-radius:999px;padding:2px 8px;font-weight:700;margin-left:6px}
   .fmt:disabled{opacity:.55;cursor:not-allowed}
   h2{font-size:15px;margin:18px 0 0} .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-  .chip{font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
-  .banner{background:linear-gradient(90deg,var(--yellow),var(--amber));color:#121212;border-radius:16px;padding:16px;margin-top:14px;display:flex;gap:12px;align-items:center;justify-content:space-between}
-  .banner b{display:block} .banner p{margin:4px 0 0;font-size:12px;opacity:.8}
-  .prog{height:8px;background:#374151;border-radius:999px;overflow:hidden;margin-top:8px}
-  .prog i{display:block;height:100%;background:var(--yellow);width:45%}
-  nav{position:fixed;bottom:0;left:0;right:0;background:rgba(18,18,18,.95);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
+  .chip{font-size:12px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+  .banner{background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff;border-radius:16px;padding:16px;margin-top:14px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .banner b{display:block} .banner p{margin:4px 0 0;font-size:12px;opacity:.85}
+  .prog{height:8px;background:#e6ebf2;border-radius:999px;overflow:hidden;margin-top:8px}
+  .prog i{display:block;height:100%;background:var(--blue);width:45%}
+  nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
   nav .row{max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;font-size:12px;padding:8px 0}
-  nav a{color:#D1D5DB;text-decoration:none;padding:4px 0} nav a.on{color:var(--yellow);font-weight:700}
+  nav a{color:#64748b;text-decoration:none;padding:4px 0} nav a.on{color:var(--blue);font-weight:700}
   .foot{text-align:center;font-size:12px;color:var(--muted);margin-top:20px;line-height:1.6}
-  a{color:var(--yellow)}
+  a{color:var(--blue)}
+  #easysave-dynamic-ad-slot{display:block;margin-top:18px;text-align:center;min-height:10px}
+  #easysave-dynamic-ad-slot.on{display:block}
+  #easysave-dynamic-ad-slot iframe{max-width:100%}
 </style>
 </head>
 <body>
@@ -52,20 +59,20 @@
   </header>
 
   <form id="form" class="bar">
-    <div class="in"><span aria-hidden="true">🔗</span><input id="url" inputmode="url" placeholder="Paste video link — YouTube, TikTok, Instagram, Facebook, X…" autocomplete="off"><button type="button" id="clear" aria-label="Clear" style="background:none;border:0;color:#9CA3AF;cursor:pointer">✕</button></div>
+    <div class="in"><span aria-hidden="true">🔗</span><input id="url" inputmode="url" placeholder="Paste video link — YouTube, TikTok, Instagram, Facebook, X…" autocomplete="off"><button type="button" id="clear" aria-label="Clear" style="background:none;border:0;color:#94a3b8;cursor:pointer">✕</button></div>
     <button class="btn" id="get" type="submit">Get</button>
   </form>
   <p class="note">Link copy karo, site kholo — link khud aa jayega Download button ke saath, SnapTube ki tarah.</p>
 
-  <section id="autoCard" class="card" style="border-color:var(--yellow)" hidden>
+  <section id="autoCard" class="card" style="border-color:var(--blue)" hidden>
     <div style="display:flex;gap:10px;align-items:center">
       <div style="flex:1;min-width:0"><b style="font-size:14px">Copied link found</b><div id="autoLink" class="note" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px"></div></div>
       <button class="btn" id="autoDl" type="button" style="padding:12px 18px;white-space:nowrap">Download</button>
-      <button type="button" id="autoX" aria-label="Dismiss" style="background:none;border:0;color:#9CA3AF;cursor:pointer;font-size:18px">✕</button>
+      <button type="button" id="autoX" aria-label="Dismiss" style="background:none;border:0;color:#94a3b8;cursor:pointer;font-size:18px">✕</button>
     </div>
   </section>
 
-  <div id="toast" class="card" style="border-color:#22C55E" hidden><b style="font-size:14px">Download shuru ho gaya ✓</b><p class="note" style="margin-top:4px">File Downloads / Gallery › Videos mein aa rahi hai. Naya link paste karo.</p></div>
+  <div id="toast" class="card" style="border-color:var(--mint-border);background:var(--mint-bg)" hidden><b style="font-size:14px;color:var(--mint-text)">Download shuru ho gaya ✓</b><p class="note" style="margin-top:4px">File Downloads / Gallery › Videos mein aa rahi hai. Naya link paste karo.</p></div>
 
   <div id="error" class="alert" role="alert" hidden></div>
   <button class="btn" id="retry" type="button" style="width:100%;padding:12px;margin-top:10px" hidden>Try again</button>
@@ -84,7 +91,7 @@
     <p class="note">Video downloads as MP4 with sound (up to 1080p). The backend merges the best video + audio for you.</p>
     <h2>Audio — MP3 / M4A</h2>
     <div class="grid" id="audioGrid"></div>
-    <p class="note" id="audioNote">Audio-only download needs the new EasyDownloader API. Video MP4 with sound works now — audio (MP3 / M4A 128 &amp; 320kbps) is the next update, in <code>apps/api/app.py</code>.</p>
+    <p class="note" id="audioNote">Audio downloads as MP3 or M4A, straight to Downloads.</p>
     <button class="btn" id="addQueue" type="button" style="width:100%;padding:12px;margin-top:12px">+ Add this video to batch queue</button>
   </section>
 
@@ -98,6 +105,22 @@
   <section class="banner">
     <div><b>100% Free — no login, no subscription</b><p>Every format, every video, free. Just like Snaptube.</p></div>
   </section>
+
+  <!-- Dynamic ad slot: EasySave's own ad-network banner (300x250), user-provided 2026-11-03.
+       Only this banner is kept — the abscloud + bauval/14 scripts caused a full-page
+       "CONFIRM YOU ARE NOT A ROBOT" overlay and were removed 2026-11-03 night. -->
+  <div id="easysave-dynamic-ad-slot" class="on" style="display:block">
+    <script>
+      atOptions = {
+        'key' : 'a1f52b6f3fa444c3c9cfae05962d6c16',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script src="https://bauval.org/22/a1f52b6f3fa444c3c9cfae05962d6c16"></script>
+  </div>
 
   <section id="downloads" hidden>
     <h2>Downloads</h2>
