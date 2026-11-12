@@ -236,7 +236,7 @@ function startDownload(url, label, formatId){
   if(formatId) href+="&format="+encodeURIComponent(formatId);
   var a=document.createElement("a"); a.href=href; a.download=""; document.body.appendChild(a); a.click(); a.remove();
   // Browser download has no completion callback, so the page clears on
-  // download START (Snaptube behaviour): the file keeps downloading in the
+  // download START: the file keeps downloading in the
   // browser, and the page is ready for the next link. Downloads list stays.
   lastAutoUrl=url; hideAutoCard();
   setTimeout(function(){
