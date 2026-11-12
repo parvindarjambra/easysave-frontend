@@ -55,7 +55,17 @@
     <div class="in"><span aria-hidden="true">🔗</span><input id="url" inputmode="url" placeholder="Paste video link — YouTube, TikTok, Instagram, Facebook, X…" autocomplete="off"><button type="button" id="clear" aria-label="Clear" style="background:none;border:0;color:#9CA3AF;cursor:pointer">✕</button></div>
     <button class="btn" id="get" type="submit">Get</button>
   </form>
-  <p class="note">Copied a link? Open this page and it appears automatically. Tap Get, pick a format, and the file saves to Downloads / Gallery › Videos.</p>
+  <p class="note">Link copy karo, site kholo — link khud aa jayega Download button ke saath, SnapTube ki tarah.</p>
+
+  <section id="autoCard" class="card" style="border-color:var(--yellow)" hidden>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div style="flex:1;min-width:0"><b style="font-size:14px">Copied link found</b><div id="autoLink" class="note" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px"></div></div>
+      <button class="btn" id="autoDl" type="button" style="padding:12px 18px;white-space:nowrap">Download</button>
+      <button type="button" id="autoX" aria-label="Dismiss" style="background:none;border:0;color:#9CA3AF;cursor:pointer;font-size:18px">✕</button>
+    </div>
+  </section>
+
+  <div id="toast" class="card" style="border-color:#22C55E" hidden><b style="font-size:14px">Download shuru ho gaya ✓</b><p class="note" style="margin-top:4px">File Downloads / Gallery › Videos mein aa rahi hai. Naya link paste karo.</p></div>
 
   <div id="error" class="alert" role="alert" hidden></div>
   <button class="btn" id="retry" type="button" style="width:100%;padding:12px;margin-top:10px" hidden>Try again</button>
@@ -101,6 +111,14 @@
 <script>
 var API = "https://videos-downloader-app-production.up.railway.app";
 var lastUrl = "", lastTitle = "", lastData = null, queue = [];
+var lastAutoUrl = "", pendingAutoUrl = "", autoDownloadAfterExtract = false;
+
+function findUrlIn(s){ var m=(s||"").match(/https?:\/\/[^\s"'<>]+/); return m?m[0]:""; }
+function showAutoCard(url){
+  if(!url || url===lastAutoUrl) return;
+  pendingAutoUrl=url; $("autoLink").textContent=url; $("autoCard").hidden=false;
+}
+function hideAutoCard(){ $("autoCard").hidden=true; pendingAutoUrl=""; }
 var $ = function(id){ return document.getElementById(id); };
 
 function platformOf(u){ u=u.toLowerCase(); if(u.indexOf("youtu")>-1) return "YouTube"; if(u.indexOf("instagram.com")>-1) return "Instagram"; if(u.indexOf("tiktok.com")>-1) return "TikTok"; if(u.indexOf("facebook.com")>-1||u.indexOf("fb.watch")>-1) return "Facebook"; if(u.indexOf("twitter.com")>-1||u.indexOf("x.com")>-1) return "X"; return "Video"; }
@@ -111,9 +129,13 @@ function friendly(msg){ msg=(msg||"").toLowerCase();
   if(msg.indexOf("429")>-1||msg.indexOf("bot")>-1||msg.indexOf("rate")>-1||msg.indexOf("blocked")>-1) return "YouTube is blocking our server for this video right now (bot-check). Some videos still work — try another video, or try again later.";
   return "Could not extract this video. Check the link and try a public video."; }
 
-async function checkClipboard(){ try{ var t=await navigator.clipboard.readText(); if(t && /^https?:\/\//.test(t.trim()) && !$("url").value) $("url").value=t.trim(); }catch(e){} }
+async function checkClipboard(){ try{ var t=await navigator.clipboard.readText(); var u=findUrlIn(t); if(u && u!==lastAutoUrl){ if(!$("url").value) $("url").value=u; showAutoCard(u); } }catch(e){} }
 checkClipboard(); window.addEventListener("focus", checkClipboard);
-$("clear").onclick=function(){ $("url").value=""; $("url").focus(); };
+// Share target: Share -> EasyDownloader from Facebook/YouTube/TikTok opens /?url=... or ?text=...
+(function(){ try{ var q=new URLSearchParams(location.search); var u=findUrlIn(q.get("url")||"")||findUrlIn(q.get("text")||"")||findUrlIn(q.get("title")||""); if(u){ $("url").value=u; showAutoCard(u); autoDownloadAfterExtract=true; setTimeout(function(){ $("form").dispatchEvent(new Event("submit",{cancelable:true})); }, 400); } }catch(e){} })();
+$("clear").onclick=function(){ $("url").value=""; hideAutoCard(); $("url").focus(); };
+$("autoX").onclick=function(){ if(pendingAutoUrl) lastAutoUrl=pendingAutoUrl; hideAutoCard(); };
+$("autoDl").onclick=function(){ if(!pendingAutoUrl) return; $("url").value=pendingAutoUrl; autoDownloadAfterExtract=true; hideAutoCard(); $("form").dispatchEvent(new Event("submit",{cancelable:true})); };
 
 $("form").addEventListener("submit", async function(e){
   e.preventDefault(); var url=$("url").value.trim(); if(!url){ $("url").focus(); return; }
@@ -124,29 +146,53 @@ $("form").addEventListener("submit", async function(e){
     var d=await res.json();
     if(!res.ok || d.error) throw new Error(d.error||d.detail||"Extraction failed");
     lastData=d; lastTitle=d.title||"Video";
-    var th=ytThumb(url);
+    var th=d.thumbnail||ytThumb(url);
     $("thumb").src=th||""; $("thumb").alt=lastTitle; $("thumb").style.display=th?"block":"none";
     $("title").textContent=lastTitle;
-    $("meta").textContent=platformOf(url)+" • MP4 with sound";
+    var meta=platformOf(url)+" • MP4 with sound";
+    if(d.author) meta=d.author+" • "+meta;
+    if(d.duration) meta+=" • "+Math.floor(d.duration/60)+":"+String(Math.floor(d.duration%60)).padStart(2,"0");
+    $("meta").textContent=meta;
     $("chips").innerHTML=["360p","720p","1080p","MP3","M4A"].map(function(c){return '<span class="chip">'+c+'</span>';}).join("");
     $("preview").hidden=false;
-    var order={"Original":0,"1080p":0,"720p":1,"480p":2,"360p":3,"240p":4};
-    var fmts=(d.formats||[]).slice().sort(function(a,b){return (order[a.quality]??9)-(order[b.quality]??9);});
-    var label={Original:"1080p Full HD", "1080p":"1080p Full HD", "720p":"720p HD", "480p":"480p", "360p":"360p", "240p":"240p"};
+    // Adapter: new API returns {id,label,kind,ext}; old API returned {quality,ext}.
+    var isNew = d.formats && d.formats.length && d.formats[0].id;
     var vg=$("videoGrid"); vg.innerHTML="";
-    var seen={};
-    fmts.forEach(function(f){ var l=label[f.quality]||f.quality; if(seen[l]) return; seen[l]=1;
-      var b=document.createElement("button"); b.className="fmt"; b.type="button";
-      b.innerHTML="<b>"+l+"</b><small>MP4 • with sound • free</small>";
-      b.onclick=function(){ startDownload(url, l); }; vg.appendChild(b); });
-    if(!vg.children.length){ var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.innerHTML="<b>1080p Full HD</b><small>MP4 • with sound</small>"; b.onclick=function(){ startDownload(url,"1080p Full HD"); }; vg.appendChild(b); }
     var ag=$("audioGrid"); ag.innerHTML="";
-    ["MP3 128kbps","MP3 320kbps","M4A 128kbps","M4A 320kbps"].forEach(function(l){
-      var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.disabled=true;
-      b.innerHTML="<b>"+l+' <span class="soon">Soon</span></b><small>Audio-only • new API</small>';
-      b.onclick=function(){ showError("Audio-only download needs the new EasyDownloader API — video MP4 with sound works now."); };
-      ag.appendChild(b); });
+    var bestVideoId=null, bestVideoLabel="1080p Full HD";
+    if(isNew){
+      d.formats.forEach(function(f){
+        if(f.kind==="video"){
+          if(f.id==="v1080"){ bestVideoId=f.id; bestVideoLabel=f.label; }
+          var b=document.createElement("button"); b.className="fmt"; b.type="button";
+          b.innerHTML="<b>"+escapeHtml(f.label)+"</b><small>MP4 • with sound • free</small>";
+          (function(fid,fl){ b.onclick=function(){ startDownload(url, fl, fid); }; })(f.id, f.label);
+          vg.appendChild(b);
+        } else if(f.kind==="audio"){
+          var a=document.createElement("button"); a.className="fmt"; a.type="button";
+          a.innerHTML="<b>"+escapeHtml(f.label)+"</b><small>"+f.ext.toUpperCase()+" • audio-only • free</small>";
+          (function(fid,fl){ a.onclick=function(){ startDownload(url, fl, fid); }; })(f.id, f.label);
+          ag.appendChild(a);
+        }
+      });
+      $("audioNote").textContent="Audio downloads as MP3 or M4A, straight to Downloads.";
+    } else {
+      var order={"Original":0,"1080p":0,"720p":1,"480p":2,"360p":3,"240p":4};
+      var fmts=(d.formats||[]).slice().sort(function(a,b){return (order[a.quality]??9)-(order[b.quality]??9);});
+      var label={Original:"1080p Full HD", "1080p":"1080p Full HD", "720p":"720p HD", "480p":"480p", "360p":"360p", "240p":"240p"};
+      var seen={};
+      fmts.forEach(function(f){ var l=label[f.quality]||f.quality; if(seen[l]) return; seen[l]=1;
+        var b=document.createElement("button"); b.className="fmt"; b.type="button";
+        b.innerHTML="<b>"+l+"</b><small>MP4 • with sound • free</small>";
+        b.onclick=function(){ startDownload(url, l); }; vg.appendChild(b); });
+      ["MP3 128kbps","MP3 320kbps","M4A 128kbps","M4A 320kbps"].forEach(function(l){
+        var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.disabled=true;
+        b.innerHTML="<b>"+l+' <span class="soon">Soon</span></b><small>Audio-only • server updating…</small>';
+        ag.appendChild(b); });
+    }
+    if(!vg.children.length){ var b=document.createElement("button"); b.className="fmt"; b.type="button"; b.innerHTML="<b>1080p Full HD</b><small>MP4 • with sound</small>"; b.onclick=function(){ startDownload(url,"1080p Full HD"); }; vg.appendChild(b); }
     $("formats").hidden=false;
+    if(autoDownloadAfterExtract){ autoDownloadAfterExtract=false; startDownload(url, bestVideoLabel, bestVideoId); }
   }catch(err){ showError(friendly(err.message)); }
   finally{ $("loading").hidden=true; $("get").disabled=false; }
 });
@@ -161,9 +207,20 @@ function addDownload(title, label){
   $("dlList").prepend(d); return d;
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
-function startDownload(url, label){
+function startDownload(url, label, formatId){
   addDownload(lastTitle||"Video", label||"MP4");
-  var a=document.createElement("a"); a.href=API+"/download?url="+encodeURIComponent(url); a.download=""; document.body.appendChild(a); a.click(); a.remove();
+  var href=API+"/download?url="+encodeURIComponent(url);
+  if(formatId) href+="&format="+encodeURIComponent(formatId);
+  var a=document.createElement("a"); a.href=href; a.download=""; document.body.appendChild(a); a.click(); a.remove();
+  // Browser download has no completion callback, so the page clears on
+  // download START (Snaptube behaviour): the file keeps downloading in the
+  // browser, and the page is ready for the next link. Downloads list stays.
+  lastAutoUrl=url; hideAutoCard();
+  setTimeout(function(){
+    $("preview").hidden=true; $("formats").hidden=true; $("url").value="";
+    $("toast").hidden=false; setTimeout(function(){ $("toast").hidden=true; }, 6000);
+    $("url").focus();
+  }, 4000);
 }
 $("addQueue").onclick=function(){ if(!lastUrl) return; queue.push({url:lastUrl,title:lastTitle}); renderQueue(); };
 function renderQueue(){ $("queueBox").hidden=!queue.length; $("qCount").textContent=queue.length;
